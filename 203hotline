@@ -1,0 +1,121 @@
+#! /usr/bin/python3
+
+import sys
+import fileinput
+from math import *
+import time
+
+def print_usage():
+    print("USAGE\n\t   ./203hotline [n k | d]\n")
+    print("DESCRIPTION\n\t   n\tn value for the computation of (nk)")
+    print("\t   k\tk value for the computation of (nk)")
+    print("\t   d\taverage duration of calls (in seconds)")
+
+# def overload(n):
+#     return sum(poisson(c, i) for i in range(26, 51)) * 100)
+ 
+def poisson(d):
+    t = time.clock() * 1000
+    overload = 0
+    i = 0
+    j = 3500 * (d / (3600 * 8))
+    a = exp(-j) * pow(j, i) / factorial(i)
+    print("Poisson distribution:")
+    print("%d -> %0.3f" %(i, a), end='')
+    for i in range(50):
+        i += 1
+        if (i > 0 and (i % 6) != (0)):
+            print("\t", end='')
+        a = exp(-j) * pow(j, i) / factorial(i)
+        if (i > 25):
+            overload += a
+        print("%d -> %0.3f" %(i, a), end='')
+        if ((i + 1) % 6 == 0):
+            print("")
+    i = 51
+    while i < 3501:
+        try:
+            overload += exp(-j) * pow(j, i) / factorial(i)
+        except Exception: 
+            pass
+        i += 1
+    print("")
+    print("overload: %0.1f%%" %(overload * 100))
+    print("computation time: %0.2f ms" %(time.clock() * 1000 - t))
+
+# def binomial(x, y):
+#     if y == x:
+#         return 1
+#     elif y == 1:
+#         return x
+#     elif y > x:
+#         return 0
+#     else:
+#         a = math.factorial(x)
+#         b = math.factorial(y)
+#         c = math.factorial(x-y)
+#         div = a // (b * c)
+#         return div
+#     return -1
+
+def combinaison(n, k):
+    return (factorial(n) // (factorial(k) * factorial(n - k)))
+
+def binomial(d):
+    t = time.clock() * 1000
+    p = d / 28800
+    n = 3500
+    k = 0
+    overload = 0
+
+    res = (combinaison(n, k) * (p ** k) * ((1 - p) ** (n - k)))
+    print("Binomial distribution:")
+    print("%d -> %0.3f" %(k, res), end='')
+    for k in range(51):
+        k += 1
+        if (k > 0 and (k % 6) != (0)):
+            print("\t", end='')
+        res = (combinaison(n, k) * (p ** k) * ((1 - p) ** (n - k)))
+        if (k > 25):
+            overload += res
+        print("%d -> %0.3f" %(k, res), end='')
+        if ((k + 1) % 6 == 0):
+            print("")
+    k = 51
+    while k < 3501:
+        try:
+            overload += (combinaison(n, k) * (p ** k) * ((1 - p) ** (n - k)))
+        except Exception: 
+            pass
+        k += 1
+        
+    print("")
+    print("overload: %0.1f%%" % (overload * 100))
+    print("computation time: %0.2f ms" %(time.clock() * 1000 - t))
+    print("")
+
+def combine(n, k):
+    print("%d-combination of a %d set:" % (k, n))
+    print(combinaison(n, k))
+
+def main():
+    if (len(sys.argv) != 2 and len(sys.argv) != 3):
+        exit(84)
+    if (len(sys.argv) == 2):
+        if (sys.argv[1].isnumeric() == False):
+            exit(84)
+        if (int(sys.argv[1]) < 0):
+            exit(84)
+        binomial(int(sys.argv[1]))
+        poisson(int(sys.argv[1]))
+    if ((len(sys.argv) == 3)):
+        if (sys.argv[1].isnumeric() == False or sys.argv[2].isnumeric() == False):
+            exit(84)
+        if (int(sys.argv[1]) < 0 or int(sys.argv[2]) < 0):
+            exit(84)
+        combine(int(sys.argv[1]), int(sys.argv[2]))
+    exit(0)
+
+
+if __name__ == "__main__":
+    main()
